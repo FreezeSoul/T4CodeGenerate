@@ -8,9 +8,9 @@ namespace CodeGen.Models
 {
     public interface ITemplate
     {
-        bool IncludeRelationships { get; set; }
+        string TransformText();
         Table Table { get; set; }
         Tables Tables { get; set; }
-        string TransformText();
+        bool IncludeRelationships { get; set; }
     }
 }

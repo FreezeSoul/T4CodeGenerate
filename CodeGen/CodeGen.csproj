@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\ITemplate.cs" />
+    <Compile Include="Models\OutputFileNameAttribute.cs" />
     <Compile Include="Templates.Partial\Common_CodeSnippetsTemplate.cs" />
     <Compile Include="DbServerProviderName.cs" />
     <Compile Include="DbServerType.cs" />

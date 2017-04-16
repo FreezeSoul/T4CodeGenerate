@@ -4,6 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows;
@@ -44,18 +45,19 @@ namespace CodeGen.UI
                         throw new Exception(string.Format("Empty database or invalid connection string: {0}", connectionString));
                     }
                     var response = new GenerateCodeResponse { Filenames = new List<string>() };
-                    var templates = new Dictionary<Type, string>()
+                    var types = AppDomain.CurrentDomain.GetAssemblies().SelectMany(s => s.GetTypes()).Where(p => typeof(ITemplate).IsAssignableFrom(p));
+                    foreach (var type in types)
                     {
-                        {typeof(Common_CodeSnippetsTemplate), "CodeSnippetsTemplate.cs"},
-                    };
-                    foreach (var keyValuePair in templates)
-                    {
-                        var templateType = keyValuePair.Key;
-                        var fileName = keyValuePair.Value;
-                        typeof(GenerateCodeProcessor).GetMethod("GenerateCode").MakeGenericMethod(templateType).Invoke(null, new object[]
+                        var attr = (OutputFileNameAttribute)type.GetCustomAttributes(typeof(OutputFileNameAttribute), true).FirstOrDefault();
+                        if (attr != null)
                         {
-                            tables, request, response, templateType.Name, fileName
-                        });
+                            typeof(GenerateCodeProcessor).GetMethod("GenerateCode")
+                                .MakeGenericMethod(type)
+                                .Invoke(null, new object[]
+                                {
+                                    tables, request, response, type.Name, attr.FileName
+                                });
+                        }
                     }
                     return response;
                 }
